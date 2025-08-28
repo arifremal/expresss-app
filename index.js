@@ -12,21 +12,34 @@ app.get("/", (req, res) => {
 });
 // saving data
 app.post("/person", express.json(), async (req, res) => {
-  const { email, name, age } = req.body;
-  const newPerson = new Person({
-    name,
-    email,
-    age,
-  });
-  await newPerson.save();
-  res.send("person added");
+  try {
+    const { email, name, age } = req.body;
+    const newPerson = new Person({
+      name,
+      email,
+      age,
+    });
+    await newPerson.save();
+    res.send("person added");
+  } catch (error) {
+    res.send(error.message);
+  }
 });
 // updating data
 app.put("/person", express.json(), async (req, res) => {
-  const { email } = req.body;
-  const personData = await Person.find({ email });
+  const { id } = req.body;
+  const personData = await Person.findByIdAndUpdate(id, { age: "28" });
+
+  await personData.save();
   console.log(personData);
   res.send("pp updated");
+});
+// deleting data from mongo
+
+app.delete("/person/:id", async (req, res) => {
+  const { id } = req.params;
+  await Person.findByIdAndDelete(id);
+  res.send("user deleted");
 });
 
 app.listen(PORT, () => {
